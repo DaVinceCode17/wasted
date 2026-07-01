@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Customer - Cyron's Laundry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        html, body { height: 100%; min-height: 100vh; }
+        body { background: #d4edff; display: flex; justify-content: center; align-items: flex-start; padding: 0; margin: 0; }
+        .main-wrapper { width: 100%; max-width: 700px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; width: 100%; background: transparent; flex-shrink: 0; padding: 0 4px; }
+        .top-bar .user-info { display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 600; color: #0f2b3a; padding: 6px 12px; border-radius: 30px; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); }
+        .top-bar .user-info i { font-size: 1.6rem; color: #0f2b3a; }
+        .logout-btn { font-size: 0.75rem; color: #0f2b3a; text-decoration: none; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); padding: 6px 14px; border-radius: 30px; font-weight: 600; border: none; cursor: pointer; }
+        .logout-btn:hover { background: rgba(255,255,255,0.9); }
+        
+        .page-title { text-align: center; margin-bottom: 16px; flex-shrink: 0; padding: 0 4px; }
+        .page-title h2 { color: #0f2b3a; font-size: 1.6rem; font-weight: 700; }
+        .page-title .sub-title { color: #0f2b3a; font-size: 0.9rem; opacity: 0.8; }
+        
+        .container { width: 100%; background: white; border-radius: 30px; padding: 24px 20px 20px 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.10); flex: 1; display: flex; flex-direction: column; }
+        
+        .form-group { margin-bottom: 16px; flex-shrink: 0; }
+        .form-group label { display: block; font-weight: 600; color: #0f2b3a; font-size: 0.85rem; margin-bottom: 4px; }
+        
+        .label-with-icons { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .label-with-icons .label-left { display: flex; align-items: center; gap: 6px; }
+        .label-with-icons .icons-right { display: flex; align-items: center; gap: 12px; }
+        
+        .mini-cart { background: #eef3f7; border-radius: 30px; padding: 0px 12px; border: 1px solid #dce6ed; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; color: #0f2b3a; font-size: 0.8rem; transition: 0.2s; height: 32px; }
+        .mini-cart:hover { background: #dce6ed; }
+        .mini-cart .badge { color: black; border-radius: 30px; padding-left: 4px; font-size: 1.2rem; margin-top: -2px; }
+        
+        .icon-btn { background: #eef3f7; border-radius: 30px; padding: 0px 12px; border: 1px solid #dce6ed; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; color: #0f2b3a; font-size: 0.75rem; transition: 0.2s; height: 32px; text-decoration: none; }
+        .icon-btn:hover { background: #dce6ed; }
+        .icon-btn i { font-size: 0.9rem; }
+        
+        .notif-bell { position: relative; display: inline-flex; align-items: center; cursor: pointer; background: #eef3f7; border-radius: 30px; padding: 0px 12px; border: 1px solid #dce6ed; height: 32px; transition: 0.2s; }
+        .notif-bell:hover { background: #dce6ed; }
+        .notif-bell .badge-notif { position: absolute; top: -6px; right: -6px; background: #e53935; color: white; border-radius: 50%; padding: 1px 5px; font-size: 0.55rem; font-weight: 700; min-width: 16px; text-align: center; }
+        .notif-bell i { font-size: 0.9rem; color: #0f2b3a; }
+        
+        .btn-group-inline { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+        .btn-group-inline label { flex: 1; min-width: 80px; margin: 0; padding: 0; }
+        .btn-group-inline label input { display: none; }
+        .btn-group-inline .option-btn { display: block; width: 100%; padding: 10px 12px; border-radius: 60px; border: 2px solid #dce6ed; background: white; font-size: 0.85rem; font-weight: 600; text-align: center; color: #0f2b3a; cursor: pointer; transition: 0.2s; user-select: none; }
+        .btn-group-inline .option-btn:hover { background: #eef3f7; }
+        .btn-group-inline input:checked + .option-btn { background: #1f6f8a; color: white; border-color: #1f6f8a; }
+        
+        .btn { padding: 14px 20px; border: none; border-radius: 60px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; transition: 0.25s; flex-shrink: 0; }
+        .btn-secondary { background: #1a8c4a; color: white; box-shadow: 0 4px 16px rgba(31,111,138,0.2); }
+        .btn-secondary:hover { background: #14753d; transform: translateY(-2px); }
+        
+        .order-summary-box { margin-top: 16px; background: #f8fbfd; border-radius: 14px; padding: 14px; border: 1px solid #e8eef2; display: none; flex-shrink: 0; }
+        .order-summary-box.show { display: block; }
+        .order-summary-box h4 { font-size: 0.9rem; color: #0f2b3a; margin-bottom: 8px; border-bottom: 1px solid #eef3f7; padding-bottom: 8px; }
+        .order-summary-box .detail-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.85rem; color: #0f2b3a; }
+        .order-summary-box .detail-row .label { color: #4f6f82; }
+        .order-summary-box .detail-row .value { font-weight: 600; }
+        
+        .notification-msg { padding: 10px 14px; border-radius: 12px; margin-bottom: 14px; font-size: 0.85rem; color: #0f2b3a; display: none; flex-shrink: 0; }
+        .notification-msg.show { display: block; }
+        .notification-msg.error { background: #FFEBEE; }
+        .notification-msg.success { background: #E8F5E9; }
+        
+        .footer-note { margin-top: 14px; font-size: 0.75rem; color: #6f8fa2; text-align: center; border-top: 1px solid #eef3f7; padding-top: 12px; flex-shrink: 0; }
+        
+        .notif-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); z-index: 1002; justify-content: center; align-items: center; padding: 20px; }
+        .notif-modal.show { display: flex; }
+        .notif-modal .modal-content { background: white; border-radius: 24px; max-width: 420px; width: 100%; padding: 24px 20px; max-height: 80vh; overflow-y: auto; }
+        .notif-modal .modal-content h3 { font-size: 1.1rem; color: #0f2b3a; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .notif-modal .modal-content .close-btn { background: #eef3f7; border: none; padding: 4px 16px; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+        .notif-item { padding: 10px 0; border-bottom: 1px solid #eef3f7; font-size: 0.85rem; }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item .notif-time { font-size: 0.7rem; color: #6f8fa2; }
+        .notif-item .notif-msg { font-weight: 500; }
+        .notif-empty { text-align: center; color: #6f8fa2; padding: 20px 0; font-size: 0.9rem; }
+        
+        .success-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .success-popup.show { display: flex; }
+        .success-popup .popup-box { background: white; border-radius: 24px; max-width: 340px; width: 100%; padding: 32px 24px 24px; text-align: center; animation: popIn 0.3s ease; }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .success-popup .popup-box .icon { font-size: 3.5rem; color: #1a8c4a; margin-bottom: 12px; }
+        .success-popup .popup-box h3 { font-size: 1.2rem; color: #0f2b3a; margin-bottom: 6px; }
+        .success-popup .popup-box p { font-size: 0.9rem; color: #4f6f82; margin-bottom: 20px; }
+        .success-popup .popup-box .btn-ok { background: #1f6f8a; color: white; border: none; padding: 12px 30px; border-radius: 60px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .success-popup .popup-box .btn-ok:hover { background: #185a72; }
+        
+        .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+        .cart-modal.show { display: flex; }
+        .cart-modal .modal-content { background: white; border-radius: 24px; max-width: 420px; width: 100%; padding: 24px 20px; max-height: 80vh; overflow-y: auto; }
+        .cart-modal .modal-content h3 { font-size: 1.1rem; color: #0f2b3a; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-modal .modal-content .close-btn { background: #eef3f7; border: none; padding: 4px 16px; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+        .cart-modal .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eef3f7; font-size: 0.85rem; }
+        .cart-modal .cart-item .status-text { font-weight: 600; color: #333; }
+        .cart-modal .empty-cart { text-align: center; color: #6f8fa2; padding: 20px 0; font-size: 0.9rem; }
+
+        @media (max-width: 700px) { .main-wrapper { max-width: 100%; padding: 16px; margin: 0; } }
+        @media (max-width: 600px) {
+            body { padding: 0; align-items: flex-start; }
+            .main-wrapper { padding: 12px; margin-top: 0; }
+            .container { padding: 18px 14px; border-radius: 24px; }
+            .top-bar .user-info { font-size: 0.9rem; padding: 4px 10px; }
+            .top-bar .user-info i { font-size: 1.3rem; }
+            .page-title h2 { font-size: 1.3rem; }
+            .btn-group-inline label { min-width: 60px; }
+            .btn-group-inline .option-btn { font-size: 0.8rem; padding: 8px 10px; }
+            .btn { font-size: 0.9rem; padding: 12px 16px; }
+            .label-with-icons .icons-right { gap: 6px; }
+            .mini-cart { font-size: 0.65rem; padding: 0 8px; height: 28px; }
+            .icon-btn { font-size: 0.65rem; padding: 0 8px; height: 28px; }
+            .icon-btn i { font-size: 0.75rem; }
+            .notif-bell { padding: 0 8px; height: 28px; }
+            .notif-bell i { font-size: 0.75rem; }
+            .notif-bell .badge-notif { font-size: 0.5rem; min-width: 14px; padding: 1px 4px; top: -4px; right: -4px; }
+        }
+        @media (max-width: 450px) {
+            .main-wrapper { padding: 8px; }
+            .container { padding: 14px 10px; border-radius: 20px; }
+            .top-bar { gap: 6px; }
+            .top-bar .user-info { font-size: 0.8rem; padding: 4px 8px; }
+            .top-bar .user-info i { font-size: 1.1rem; }
+            .logout-btn { font-size: 0.65rem; padding: 4px 10px; }
+            .page-title h2 { font-size: 1.1rem; }
+            .page-title .sub-title { font-size: 0.75rem; }
+            .form-group { margin-bottom: 12px; }
+            .form-group label { font-size: 0.75rem; }
+            .btn-group-inline label { min-width: 50px; }
+            .btn-group-inline .option-btn { font-size: 0.7rem; padding: 6px 8px; }
+            .btn { font-size: 0.8rem; padding: 10px 14px; }
+            .mini-cart { font-size: 0.6rem; padding: 0 6px; height: 24px; }
+            .mini-cart .badge { font-size: 0.8rem; }
+            .icon-btn { font-size: 0.6rem; padding: 0 6px; height: 24px; }
+            .icon-btn i { font-size: 0.65rem; }
+            .notif-bell { padding: 0 6px; height: 24px; }
+            .notif-bell i { font-size: 0.65rem; }
+            .order-summary-box .detail-row { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+
+        <div class="top-bar">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="userNameDisplay">Loading...</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <div class="page-title">
+            <h2>Schedule Service</h2>
+            <p class="sub-title">Fill in the details below</p>
+        </div>
+
+        <div class="container">
+
+            <div id="customerNotification" class="notification-msg"></div>
+
+            <div class="form-group">
+                <div class="label-with-icons">
+                    <div class="label-left">
+                        <label><i class="fas fa-truck"></i> Service Type</label>
+                    </div>
+                    <div class="icons-right">
+                        <div class="mini-cart" id="miniCartIcon">
+                            <i class="fas fa-shopping-cart"></i> <span class="badge" id="miniCartBadge">0</span>
+                        </div>
+                        <a href="history.html" class="icon-btn">
+                            <i class="fas fa-history"></i> History
+                        </a>
+                        <div class="notif-bell" id="notifBell">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge-notif" id="notifBadge">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group-inline" id="serviceTypeGroup">
+                    <label><input type="radio" name="serviceType" value="dropoff" checked /><span class="option-btn">Drop-off</span></label>
+                    <label><input type="radio" name="serviceType" value="pickup" /><span class="option-btn">Pick-up</span></label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Select Services</label>
+                <div class="btn-group-inline" id="servicesGroup">
+                    <label><input type="checkbox" value="Wash" checked /><span class="option-btn">Wash</span></label>
+                    <label><input type="checkbox" value="Dry" /><span class="option-btn">Dry</span></label>
+                    <label><input type="checkbox" value="Iron" /><span class="option-btn">Iron</span></label>
+                    <label><input type="checkbox" value="Fold" /><span class="option-btn">Fold</span></label>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" id="submitOrderBtn">Submit Order</button>
+
+            <div id="orderSummaryBox" class="order-summary-box">
+                <h4><i class="fas fa-receipt"></i> Order Details</h4>
+                <div id="orderSummaryContent"></div>
+                <div class="footer-note"><i class="fas fa-info-circle"></i> Staff will update weight, price, and time</div>
+            </div>
+
+            <div style="flex: 1;"></div>
+
+        </div>
+    </div>
+
+    <div class="notif-modal" id="notifModal">
+        <div class="modal-content">
+            <h3><span><i class="fas fa-bell"></i> Notifications</span><button class="close-btn" id="closeNotifBtn"><i class="fas fa-times"></i> Close</button></h3>
+            <div id="notifList"><div class="notif-empty">No new notifications.</div></div>
+        </div>
+    </div>
+
+    <div class="success-popup" id="successPopup">
+        <div class="popup-box">
+            <div class="icon"><i class="fas fa-check-circle"></i></div>
+            <h3>Order Submitted!</h3>
+            <p id="popupMessage">Your order has been placed successfully.</p>
+            <button class="btn-ok" id="popupOkBtn">Okay</button>
+        </div>
+    </div>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="modal-content">
+            <h3><span><i class="fas fa-shopping-cart"></i> My Orders</span><button class="close-btn" id="closeCartBtn"><i class="fas fa-times"></i> Close</button></h3>
+            <div id="cartOrdersList"><div class="empty-cart">No orders yet.</div></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SESSION MANAGEMENT - GAMIT ANG CONTACT
+        // ============================================================
+        
+        const contact = sessionStorage.getItem('current_contact');
+        if (!contact) { window.location.href = 'login.html'; }
+
+        let customerId = null;
+
+        // ===== LOAD USER FROM DATABASE GAMIT ANG CONTACT =====
+        async function loadUser() {
+            try {
+                const response = await fetch('/api/auth/customer/by-contact/' + contact);
+                const data = await response.json();
+                if (data.success) {
+                    customerId = data.customer.id;
+                    sessionStorage.setItem('current_customer_id', customerId);
+                    document.getElementById('userNameDisplay').textContent = data.customer.firstName + ' ' + data.customer.lastName;
+                } else {
+                    document.getElementById('userNameDisplay').textContent = 'Customer';
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+                document.getElementById('userNameDisplay').textContent = 'Customer';
+            }
+        }
+
+        // ===== LOGOUT =====
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('current_customer_id');
+                sessionStorage.removeItem('current_user_role');
+                sessionStorage.removeItem('current_contact');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ============================================================
+        // CART - LAHAT NG STATUS
+        // ============================================================
+
+        async function loadCart() {
+            if (!customerId) {
+                console.log('No customerId yet');
+                return;
+            }
+            try {
+                console.log('Loading cart for customerId:', customerId);
+                const response = await fetch('/api/orders/customer/' + customerId);
+                const data = await response.json();
+                console.log('Cart response:', data);
+                
+                if (data.success) {
+                    // ✅ LAHAT NG STATUS MALIBAN SA 'claimed'
+                    const cartOrders = data.orders.filter(o => 
+                        o.status !== 'claimed'
+                    );
+                    
+                    // Sort by queueNumber ascending (oldest first)
+                    cartOrders.sort((a, b) => a.queueNumber - b.queueNumber);
+                    
+                    document.getElementById('miniCartBadge').textContent = cartOrders.length;
+                    renderCartModal(cartOrders);
+                } else {
+                    console.error('Cart error:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+        }
+
+        function renderCartModal(orders) {
+            const list = document.getElementById('cartOrdersList');
+            if (orders.length === 0) {
+                list.innerHTML = '<div class="empty-cart">No active orders.</div>';
+                return;
+            }
+            let html = '';
+            orders.forEach(o => {
+                // ✅ I-DISPLAY ANG TAMANG STATUS NAME
+                let statusLabel = o.status;
+                if (statusLabel === 'set_pricing') statusLabel = 'Set Pricing';
+                else if (statusLabel === 'to_wash') statusLabel = 'To Wash';
+                else if (statusLabel === 'to_dry') statusLabel = 'To Dry';
+                else if (statusLabel === 'to_iron') statusLabel = 'To Iron';
+                else if (statusLabel === 'to_fold') statusLabel = 'To Fold';
+                else if (statusLabel === 'for_pickup') statusLabel = 'For Pickup';
+                else if (statusLabel === 'to_deliver') statusLabel = 'To Deliver';
+                else if (statusLabel === 'pending') statusLabel = 'Pending';
+                else if (statusLabel === 'claimed') statusLabel = 'Claimed';
+                else statusLabel = o.status.charAt(0).toUpperCase() + o.status.slice(1);
+                
+                const weightDisplay = o.weight > 0 ? o.weight + ' kg' : '--';
+                const priceDisplay = o.price > 0 ? '₱' + o.price : '--';
+                
+                html += `
+                    <div class="cart-item">
+                        <div>
+                            <strong>Batch #${o.queueNumber}</strong> — ${o.services}
+                            <br /><small style="color:#4f6f82;">${o.serviceType === 'dropoff' ? 'Drop-off' : 'Pick-up'} · ${o.createdAt}</small>
+                            <br /><small style="color:#4f6f82;">Weight: ${weightDisplay} | Price: ${priceDisplay}</small>
+                        </div>
+                        <span class="status-text">${statusLabel}</span>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // ============================================================
+        // NOTIFICATIONS - PICKUP AT DELIVER
+        // ============================================================
+
+        let notifications = [];
+
+        async function loadNotifications() {
+            if (!customerId) return;
+            try {
+                const response = await fetch('/api/orders/customer/' + customerId);
+                const data = await response.json();
+                if (data.success) {
+                    // ✅ FOR PICKUP AT TO DELIVER LANG
+                    const notifyOrders = data.orders.filter(o => 
+                        o.status === 'for_pickup' || o.status === 'to_deliver'
+                    );
+                    
+                    notifications = notifyOrders.map(o => {
+                        const msg = o.status === 'for_pickup' 
+                            ? `Your laundry is ready for pickup! (${o.services}) - Please claim at the shop.`
+                            : `Your laundry is on its way for delivery! (${o.services}) - Please wait for delivery.`;
+                        return {
+                            id: o.id,
+                            message: msg,
+                            time: o.updatedAt || o.createdAt,
+                            services: o.services
+                        };
+                    });
+                    
+                    document.getElementById('notifBadge').textContent = notifications.length;
+                    
+                    if (document.getElementById('notifModal').classList.contains('show')) {
+                        renderNotifications();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notifList');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="notif-empty">No new notifications.</div>';
+                return;
+            }
+            let html = '';
+            notifications.forEach(n => {
+                html += `
+                    <div class="notif-item">
+                        <div class="notif-msg">${n.message}</div>
+                        <div class="notif-time">${n.time || ''}</div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // ============================================================
+        // SUBMIT ORDER
+        // ============================================================
+
+        document.getElementById('submitOrderBtn').addEventListener('click', async function() {
+            const notif = document.getElementById('customerNotification');
+            if (!customerId) {
+                notif.className = 'notification-msg show error';
+                notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please log in first.';
+                return;
+            }
+
+            const serviceType = document.querySelector('input[name="serviceType"]:checked').value;
+            const services = [];
+            document.querySelectorAll('#servicesGroup input[type="checkbox"]:checked').forEach(cb => services.push(cb.value));
+
+            if (services.length === 0) {
+                notif.className = 'notification-msg show error';
+                notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select at least one service.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/orders/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerId: parseInt(customerId),
+                        services: services.join(', '),
+                        serviceType: serviceType
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const order = data.order;
+                    const summaryBox = document.getElementById('orderSummaryBox');
+                    document.getElementById('orderSummaryContent').innerHTML = `
+                        <div class="detail-row"><span class="label">Batch #</span><span class="value">${order.queueNumber}</span></div>
+                        <div class="detail-row"><span class="label">Services</span><span class="value">${services.join(' + ')}</span></div>
+                        <div class="detail-row"><span class="label">Status</span><span class="value" style="color:#b8860b;">Set Pricing</span></div>
+                    `;
+                    summaryBox.classList.add('show');
+                    document.getElementById('popupMessage').textContent = 'Order #' + order.queueNumber + ' submitted successfully!';
+                    document.getElementById('successPopup').classList.add('show');
+                    
+                    // ✅ I-REFRESH ANG CART AT NOTIFICATIONS
+                    await loadCart();
+                    await loadNotifications();
+                    
+                    document.querySelectorAll('#servicesGroup input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    document.querySelector('#servicesGroup input[value="Wash"]').checked = true;
+                    
+                    notif.className = 'notification-msg';
+                } else {
+                    notif.className = 'notification-msg show error';
+                    notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
+                }
+            } catch (error) {
+                notif.className = 'notification-msg show error';
+                notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error. Please try again.';
+                console.error('Submit order error:', error);
+            }
+        });
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+
+        document.getElementById('miniCartIcon').addEventListener('click', function() {
+            document.getElementById('cartModal').classList.add('show');
+        });
+
+        document.getElementById('closeCartBtn').addEventListener('click', function() {
+            document.getElementById('cartModal').classList.remove('show');
+        });
+
+        document.getElementById('cartModal').addEventListener('click', function(e) {
+            if (e.target === this) { this.classList.remove('show'); }
+        });
+
+        document.getElementById('notifBell').addEventListener('click', function() {
+            renderNotifications();
+            document.getElementById('notifModal').classList.add('show');
+        });
+
+        document.getElementById('closeNotifBtn').addEventListener('click', function() {
+            document.getElementById('notifModal').classList.remove('show');
+        });
+
+        document.getElementById('notifModal').addEventListener('click', function(e) {
+            if (e.target === this) { this.classList.remove('show'); }
+        });
+
+        document.getElementById('popupOkBtn').addEventListener('click', function() {
+            document.getElementById('successPopup').classList.remove('show');
+        });
+
+        // ============================================================
+        // AUTO-REFRESH
+        // ============================================================
+
+        setInterval(() => {
+            if (customerId) {
+                loadCart();
+                loadNotifications();
+            }
+        }, 10000);
+
+        // ============================================================
+        // INIT
+        // ============================================================
+
+        loadUser().then(() => {
+            loadCart();
+            loadNotifications();
+        });
+    </script>
+
+</body>
+</html>

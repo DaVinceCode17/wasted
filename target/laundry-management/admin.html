@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Admin - Cyron's Laundry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        html, body { height: 100%; min-height: 100vh; }
+        body { background: #d4edff; display: flex; justify-content: center; align-items: flex-start; padding: 0; margin: 0; }
+        .main-wrapper { width: 100%; max-width: 700px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
+
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; width: 100%; background: transparent; flex-shrink: 0; padding: 0 4px; }
+        .top-bar .user-info { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 600; color: #0f2b3a; padding: 6px 12px; border-radius: 30px; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); }
+        .top-bar .user-info i { font-size: 1.6rem; color: #0f2b3a; }
+        .logout-btn { font-size: 0.85rem; color: #0f2b3a; text-decoration: none; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); padding: 8px 18px; border-radius: 30px; font-weight: 600; border: none; cursor: pointer; }
+        .logout-btn:hover { background: rgba(255,255,255,0.9); }
+
+        .main-title { text-align: center; margin-top: 30px; margin-bottom: 30px; flex-shrink: 0; padding: 0 4px; }
+        .main-title h1 { color: #0f2b3a; font-size: 3rem; font-weight: 700; letter-spacing: 1px; }
+        .main-title .sub-title { color: #0f2b3a; font-size: 1.3rem; opacity: 0.8; font-weight: 500; margin-top: 6px; }
+
+        .main-menu { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; flex: 1; justify-content: center; }
+        .menu-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .menu-btn { flex: 1; min-width: 140px; padding: 24px 16px; background: rgba(255,255,255,0.85); backdrop-filter: blur(4px); border: 2px solid rgba(255,255,255,0.5); border-radius: 20px; text-align: center; font-weight: 700; font-size: 1.2rem; color: #0f2b3a; cursor: pointer; transition: 0.25s; box-shadow: 0 4px 16px rgba(0,0,0,0.06); letter-spacing: 0.5px; }
+        .menu-btn:hover { background: #1f6f8a; color: white; border-color: #1f6f8a; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(31,111,138,0.25); }
+
+        .spacer { height: 40px; }
+
+        .section { display: none; width: 100%; flex: 1; min-height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+
+        .form-card { width: 100%; background: rgba(255,255,255,0.95); border-radius: 18px; padding: 18px 16px; border: 1px solid #e8eef2; flex: 1; display: flex; flex-direction: column; min-height: 100%; }
+        .form-card h3 { font-size: 0.95rem; color: #0f2b3a; margin-bottom: 12px; text-align: center; flex-shrink: 0; }
+
+        .back-btn { background: #eef3f7; border: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; color: #0f2b3a; cursor: pointer; font-size: 0.85rem; margin-bottom: 12px; align-self: flex-start; }
+        .back-btn:hover { background: #dce6ed; }
+
+        .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin: 8px 0 12px; }
+        .pricing-item { background: white; padding: 10px 6px; border-radius: 16px; border: 1px solid #dce6ed; text-align: center; }
+        .pricing-item label { display: block; font-weight: 600; font-size: 0.8rem; color: #0f2b3a; }
+        .pricing-item input { width: 70px; padding: 4px 6px; border-radius: 40px; border: 1px solid #dce6ed; text-align: center; margin-top: 4px; font-size: 0.85rem; font-weight: 600; }
+
+        .btn-primary { background: #1a8c4a; color: white; padding: 12px 16px; border: none; border-radius: 60px; font-size: 0.9rem; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; margin-top: 4px; box-shadow: 0 4px 16px rgba(26,140,74,0.2); flex-shrink: 0; }
+        .btn-primary:hover { background: #14753d; transform: translateY(-2px); }
+
+        .table-wrap { overflow-x: auto; margin-top: 4px; border-radius: 16px; flex: 1; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 280px; }
+        th, td { padding: 8px 10px; border: 1px solid #e8eef2; text-align: left; }
+        th { background: #eef3f7; font-weight: 600; color: #0f2b3a; }
+        td { background: white; }
+
+        .action-btn { padding: 4px 14px; border: none; border-radius: 40px; font-size: 0.65rem; font-weight: 600; cursor: pointer; color: white; transition: 0.15s; background: #1f6f8a; }
+        .action-btn:hover { background: #185a72; }
+        .action-btn.green { background: #1a8c4a; }
+        .action-btn.green:hover { background: #14753d; }
+
+        .notification { padding: 10px 14px; border-radius: 12px; margin-bottom: 14px; font-size: 0.85rem; color: #0f2b3a; display: none; flex-shrink: 0; }
+        .notification.show { display: block; }
+        .notification.error { background: #FFEBEE; }
+        .notification.success { background: #E8F5E9; }
+
+        .footer-note { margin-top: 14px; font-size: 0.75rem; color: #6f8fa2; text-align: center; border-top: 1px solid #eef3f7; padding-top: 12px; flex-shrink: 0; cursor: pointer; }
+
+        .popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .popup-overlay.show { display: flex; }
+        .popup-box { background: white; border-radius: 28px; max-width: 380px; width: 100%; padding: 32px 24px 24px; animation: popIn 0.2s ease; }
+        @keyframes popIn { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .popup-box h3 { font-size: 1.2rem; color: #0f2b3a; margin-bottom: 6px; text-align: center; }
+        .popup-box p { color: #4f6f82; font-size: 0.9rem; margin-bottom: 16px; text-align: center; }
+        .popup-box .form-group { margin-bottom: 12px; }
+        .popup-box .form-group label { display: block; font-weight: 600; font-size: 0.85rem; color: #0f2b3a; margin-bottom: 4px; }
+        .popup-box .form-group input { width: 100%; padding: 10px 14px; border-radius: 40px; border: 1px solid #dce6ed; font-size: 0.95rem; }
+        .popup-box .form-group .price-display { font-size: 1.2rem; font-weight: 700; color: #1a8c4a; padding: 8px 14px; background: #e8f5e9; border-radius: 40px; text-align: center; }
+        .popup-box .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+        .popup-box .btn-row .btn { flex: 1; padding: 10px 16px; border: none; border-radius: 60px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.15s; }
+        .popup-box .btn-row .btn-cancel { background: #eef3f7; color: #0f2b3a; }
+        .popup-box .btn-row .btn-cancel:hover { background: #dce6ed; }
+        .popup-box .btn-row .btn-confirm { background: #1a8c4a; color: white; }
+        .popup-box .btn-row .btn-confirm:hover { background: #14753d; }
+
+        .confirm-dialog { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); z-index: 1001; justify-content: center; align-items: center; padding: 20px; }
+        .confirm-dialog.show { display: flex; }
+        .confirm-dialog .dialog-box { background: white; border-radius: 28px; max-width: 340px; width: 100%; padding: 32px 24px 24px; text-align: center; animation: popIn 0.2s ease; }
+        .confirm-dialog .dialog-box h4 { font-size: 1.1rem; color: #0f2b3a; margin-bottom: 6px; }
+        .confirm-dialog .dialog-box p { color: #4f6f82; font-size: 0.9rem; margin-bottom: 20px; }
+        .confirm-dialog .dialog-box .btn-row { display: flex; gap: 12px; }
+        .confirm-dialog .dialog-box .btn-row .btn { flex: 1; padding: 10px 16px; border: none; border-radius: 60px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.15s; }
+        .confirm-dialog .dialog-box .btn-row .btn-cancel { background: #eef3f7; color: #0f2b3a; }
+        .confirm-dialog .dialog-box .btn-row .btn-cancel:hover { background: #dce6ed; }
+        .confirm-dialog .dialog-box .btn-row .btn-confirm { background: #1f6f8a; color: white; }
+        .confirm-dialog .dialog-box .btn-row .btn-confirm:hover { background: #185a72; }
+
+        @media (max-width: 600px) {
+            .main-wrapper { padding: 16px; }
+            .main-title h1 { font-size: 2.2rem; }
+            .main-title .sub-title { font-size: 1.0rem; }
+            .menu-btn { font-size: 1.0rem; padding: 18px 12px; min-width: 100px; }
+            .top-bar .user-info { font-size: 0.95rem; }
+            .pricing-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 450px) {
+            .main-wrapper { padding: 12px; }
+            .main-title h1 { font-size: 1.8rem; }
+            .main-title .sub-title { font-size: 0.9rem; }
+            .menu-btn { font-size: 0.85rem; padding: 14px 10px; min-width: 80px; border-radius: 16px; }
+            .menu-row { gap: 10px; }
+            .top-bar .user-info { font-size: 0.85rem; padding: 4px 10px; }
+            .top-bar .user-info i { font-size: 1.2rem; }
+            .logout-btn { font-size: 0.75rem; padding: 6px 14px; }
+            .spacer { height: 24px; }
+            .pricing-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .pricing-item input { width: 60px; }
+            table { font-size: 0.65rem; }
+            th, td { padding: 4px 6px; }
+        }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <div class="top-bar">
+        <div class="user-info"><i class="fas fa-user-circle"></i> <span id="adminNameDisplay">Admin Name</span></div>
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+
+    <div class="main-title">
+        <h1>Welcome, Admin!</h1>
+        <p class="sub-title">Manage all laundry orders from one place</p>
+    </div>
+
+    <div class="main-menu">
+        <div class="menu-row">
+            <button class="menu-btn" data-section="for_pickup">For Pickup</button>
+            <button class="menu-btn" data-section="to_deliver">To Deliver</button>
+            <button class="menu-btn" data-section="claimed">Claimed</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="menu-row">
+            <button class="menu-btn" data-section="set_price">Set Price</button>
+            <button class="menu-btn" data-section="pending">Pending</button>
+        </div>
+        <div class="menu-row">
+            <button class="menu-btn" data-section="to_wash">To Wash</button>
+            <button class="menu-btn" data-section="to_dry">To Dry</button>
+        </div>
+        <div class="menu-row">
+            <button class="menu-btn" data-section="to_iron">To Iron</button>
+            <button class="menu-btn" data-section="to_fold">To Fold</button>
+        </div>
+    </div>
+
+    <div style="width:100%; flex:1; display:flex; flex-direction:column;">
+
+        <div id="adminNotification" class="notification"></div>
+
+        <div id="section-set_price" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-tag"></i> Set Pricing</h3>
+                <div class="pricing-grid">
+                    <div class="pricing-item"><label>Wash</label><input type="number" id="priceWash" value="50" step="5" /></div>
+                    <div class="pricing-item"><label>Dry</label><input type="number" id="priceDry" value="30" step="5" /></div>
+                    <div class="pricing-item"><label>Iron</label><input type="number" id="priceIron" value="25" step="5" /></div>
+                    <div class="pricing-item"><label>Fold</label><input type="number" id="priceFold" value="20" step="5" /></div>
+                </div>
+                <button class="btn-primary" id="updatePricingBtn"><i class="fas fa-save"></i> Update Pricing</button>
+                <div style="height:16px;"></div>
+                <h3><i class="fas fa-receipt"></i> Set Pricing</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Action</th></tr></thead>
+                        <tbody id="setPriceTableBody"><tr><td colspan="5" style="text-align:center;color:#6f8fa2;">No orders</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-pending" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-clock"></i> Pending Orders</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Weight</th><th>Price</th><th>Action</th></tr></thead><tbody id="pendingTableBody"><tr><td colspan="7" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-to_wash" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-water"></i> To Wash</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Action</th></tr></thead><tbody id="toWashTableBody"><tr><td colspan="5" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-to_dry" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-wind"></i> To Dry</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Action</th></tr></thead><tbody id="toDryTableBody"><tr><td colspan="5" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-to_iron" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-tshirt"></i> To Iron</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Action</th></tr></thead><tbody id="toIronTableBody"><tr><td colspan="5" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-to_fold" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-arrow-right"></i> To Fold</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Action</th></tr></thead><tbody id="toFoldTableBody"><tr><td colspan="5" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-for_pickup" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-hand"></i> For Pickup</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Weight</th><th>Price</th><th>Action</th></tr></thead><tbody id="forPickupTableBody"><tr><td colspan="7" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-to_deliver" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-truck"></i> To Deliver</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Weight</th><th>Price</th><th>Action</th></tr></thead><tbody id="toDeliverTableBody"><tr><td colspan="7" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="section-claimed" class="section">
+            <div class="form-card">
+                <button class="back-btn" onclick="goBackToMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3><i class="fas fa-check-double"></i> Claimed Orders</h3>
+                <div class="table-wrap"><table><thead><tr><th>No.</th><th>Customer</th><th>Services</th><th>Type</th><th>Weight</th><th>Price</th></tr></thead><tbody id="claimedTableBody"><tr><td colspan="6" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-note"><i class="fas fa-info-circle"></i> Manage all laundry orders from one place</div>
+</div>
+
+<div class="popup-overlay" id="popupOverlay">
+    <div class="popup-box">
+        <h3 id="popupTitle">Set Weight & Price</h3>
+        <p id="popupMessage">Enter the weight for this order</p>
+        <div class="form-group"><label>Weight (kg)</label><input type="number" id="popupWeight" step="0.5" min="0" /></div>
+        <div class="form-group"><label>Computed Price (₱)</label><div class="price-display" id="popupPriceDisplay">₱ 0.00</div><input type="hidden" id="popupPrice" value="0" /></div>
+        <div id="popupPricingInfo" style="font-size:0.8rem;color:#4f6f82;text-align:center;margin-bottom:12px;"></div>
+        <div class="btn-row"><button class="btn btn-cancel" id="popupCancelBtn">Cancel</button><button class="btn btn-confirm" id="popupConfirmBtn">Done</button></div>
+    </div>
+</div>
+
+<div class="confirm-dialog" id="confirmDialog">
+    <div class="dialog-box">
+        <h4><i class="fas fa-exclamation-triangle" style="color:#b8860b;"></i> Confirm</h4>
+        <p id="confirmMessage">Move this order?</p>
+        <div class="btn-row"><button class="btn btn-cancel" id="confirmCancel">Cancel</button><button class="btn btn-confirm" id="confirmOk">Confirm</button></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const contact = sessionStorage.getItem('current_contact');
+    if (!contact) { window.location.href = 'login.html'; }
+
+    // ===== BACK TO MENU =====
+    window.goBackToMenu = function() {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.main-menu').style.display = 'flex';
+    };
+
+    // ===== ADMIN NAME =====
+    async function setAdminName() {
+        try {
+            const response = await fetch('/api/auth/customer/by-contact/' + contact);
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('adminNameDisplay').textContent = data.customer.firstName + ' ' + data.customer.lastName;
+            }
+        } catch (error) {
+            console.error('Error loading admin name:', error);
+        }
+    }
+    setAdminName();
+
+    // ===== LOGOUT =====
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('Logout from admin?')) {
+            sessionStorage.removeItem('current_customer_id');
+            sessionStorage.removeItem('current_user_role');
+            sessionStorage.removeItem('current_contact');
+            window.location.href = 'index.html';
+        }
+    });
+
+    // ============================================================
+    // GLOBAL VARIABLES
+    // ============================================================
+    let currentSection = 'set_price';
+    let isNavigating = false;
+
+    // ============================================================
+    // MENU NAVIGATION
+    // ============================================================
+    document.querySelectorAll('.menu-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (isNavigating) return;
+            isNavigating = true;
+            
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const sectionId = 'section-' + this.dataset.section;
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+                document.querySelector('.main-menu').style.display = 'none';
+                
+                currentSection = this.dataset.section;
+                loadTableForSection(currentSection);
+            }
+            
+            setTimeout(() => { isNavigating = false; }, 300);
+        });
+    });
+
+    function loadTableForSection(section) {
+        const tableMap = {
+            'set_price': { tbody: 'setPriceTableBody', isSetPrice: true },
+            'pending': { tbody: 'pendingTableBody', isSetPrice: false },
+            'to_wash': { tbody: 'toWashTableBody', isSetPrice: false },
+            'to_dry': { tbody: 'toDryTableBody', isSetPrice: false },
+            'to_iron': { tbody: 'toIronTableBody', isSetPrice: false },
+            'to_fold': { tbody: 'toFoldTableBody', isSetPrice: false },
+            'for_pickup': { tbody: 'forPickupTableBody', isSetPrice: false },
+            'to_deliver': { tbody: 'toDeliverTableBody', isSetPrice: false },
+            'claimed': { tbody: 'claimedTableBody', isSetPrice: false }
+        };
+        
+        const config = tableMap[section];
+        if (config) {
+            loadTable(section, config.tbody, config.isSetPrice);
+        }
+    }
+
+    // ============================================================
+    // NOTIFICATION
+    // ============================================================
+    function showNotification(message, type = 'success') {
+        const notif = document.getElementById('adminNotification');
+        if (!notif) {
+            console.log('Notification element not found. Message:', message);
+            alert(message);
+            return;
+        }
+        notif.className = 'notification show ' + type;
+        notif.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message;
+        setTimeout(() => { notif.className = 'notification'; }, 5000);
+    }
+
+    // ============================================================
+    // POPUP - SET PRICE
+    // ============================================================
+    let popupQueueNumber = null;
+    let popupServices = '';
+    let popupPricing = { washPrice: 50, dryPrice: 30, ironPrice: 25, foldPrice: 20 };
+    let isPopupProcessing = false;
+
+    function showPopup(queueNumber, services, currentWeight, currentPrice, pricing) {
+        popupQueueNumber = queueNumber;
+        popupServices = services;
+        popupPricing = pricing;
+        
+        document.getElementById('popupWeight').value = currentWeight || '';
+        document.getElementById('popupPrice').value = currentPrice || 0;
+        updatePriceDisplay();
+        
+        let info = 'Pricing: Wash ₱' + pricing.washPrice + ' | Dry ₱' + pricing.dryPrice + 
+                   ' | Iron ₱' + pricing.ironPrice + ' | Fold ₱' + pricing.foldPrice;
+        document.getElementById('popupPricingInfo').textContent = info;
+        document.getElementById('popupOverlay').classList.add('show');
+    }
+
+    function updatePriceDisplay() {
+        const weight = parseFloat(document.getElementById('popupWeight').value) || 0;
+        const price = computePrice(weight, popupServices, popupPricing);
+        document.getElementById('popupPrice').value = price;
+        document.getElementById('popupPriceDisplay').textContent = '₱ ' + price.toFixed(2);
+    }
+
+    function computePrice(weight, services, pricing) {
+        let totalServicePrice = 0;
+        const serviceList = services.split(',').map(s => s.trim());
+        if (serviceList.includes('Wash')) totalServicePrice += pricing.washPrice;
+        if (serviceList.includes('Dry')) totalServicePrice += pricing.dryPrice;
+        if (serviceList.includes('Iron')) totalServicePrice += pricing.ironPrice;
+        if (serviceList.includes('Fold')) totalServicePrice += pricing.foldPrice;
+        return weight * totalServicePrice;
+    }
+
+    document.getElementById('popupWeight').addEventListener('input', updatePriceDisplay);
+
+    document.getElementById('popupCancelBtn').addEventListener('click', function() {
+        document.getElementById('popupOverlay').classList.remove('show');
+        popupQueueNumber = null;
+        isPopupProcessing = false;
+    });
+
+    document.getElementById('popupConfirmBtn').addEventListener('click', async function() {
+        if (isPopupProcessing) return;
+        if (!popupQueueNumber) return;
+        
+        isPopupProcessing = true;
+        const weight = parseFloat(document.getElementById('popupWeight').value);
+        const price = parseFloat(document.getElementById('popupPrice').value);
+        
+        if (isNaN(weight) || weight <= 0) { 
+            alert('Please enter a valid weight.'); 
+            isPopupProcessing = false;
+            return; 
+        }
+        if (isNaN(price) || price <= 0) { 
+            alert('Price computation failed.'); 
+            isPopupProcessing = false;
+            return; 
+        }
+
+        try {
+            const response = await fetch('/api/admin/update-weight-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ queueNumber: popupQueueNumber, weight, price })
+            });
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('popupOverlay').classList.remove('show');
+                popupQueueNumber = null;
+                isPopupProcessing = false;
+                // ✅ RELOAD SET PRICING LANG
+                loadTable('set-pricing', 'setPriceTableBody', true);
+                showNotification('Weight and price set successfully!', 'success');
+            } else {
+                alert(data.message || 'Update failed');
+                isPopupProcessing = false;
+            }
+        } catch (error) {
+            console.error('Error updating weight/price:', error);
+            alert('Network error. Please try again.');
+            isPopupProcessing = false;
+        }
+    });
+
+    // ============================================================
+    // CONFIRM DIALOG
+    // ============================================================
+    let pendingAction = null;
+    let isConfirming = false;
+
+    window.showConfirmDialog = function(queueNumber, action, message) {
+        if (isConfirming) return;
+        pendingAction = { queueNumber, action };
+        document.getElementById('confirmMessage').textContent = message;
+        document.getElementById('confirmDialog').classList.add('show');
+    };
+
+    document.getElementById('confirmCancel').addEventListener('click', function() {
+        document.getElementById('confirmDialog').classList.remove('show');
+        pendingAction = null;
+        isConfirming = false;
+    });
+
+    document.getElementById('confirmOk').addEventListener('click', async function() {
+        if (isConfirming) return;
+        if (!pendingAction) return;
+        
+        isConfirming = true;
+        const { queueNumber, action } = pendingAction;
+        await moveOrder(queueNumber, action);
+        document.getElementById('confirmDialog').classList.remove('show');
+        pendingAction = null;
+        setTimeout(() => { isConfirming = false; }, 500);
+    });
+
+    document.getElementById('confirmDialog').addEventListener('click', function(e) {
+        if (e.target === this) { 
+            document.getElementById('confirmDialog').classList.remove('show');
+            pendingAction = null;
+            isConfirming = false;
+        }
+    });
+
+    // ============================================================
+    // MOVE ORDER - RELOAD CURRENT SECTION ONLY
+    // ============================================================
+    async function moveOrder(queueNumber, action) {
+        try {
+            const response = await fetch('/api/admin/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ queueNumber, action })
+            });
+            const data = await response.json();
+            if (data.success) {
+                // ✅ RELOAD CURRENT SECTION LANG
+                loadTableForSection(currentSection);
+                showNotification('Order moved successfully!', 'success');
+                return true;
+            } else {
+                showNotification(data.message || 'Failed to move order', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error moving order:', error);
+            showNotification('Network error. Please try again.', 'error');
+            return false;
+        }
+    }
+
+    // ============================================================
+    // LOAD PRICING
+    // ============================================================
+    async function loadPricing() {
+        try {
+            const response = await fetch('/api/admin/pricing');
+            const data = await response.json();
+            if (data.success && data.pricing) {
+                document.getElementById('priceWash').value = data.pricing.washPrice || 50;
+                document.getElementById('priceDry').value = data.pricing.dryPrice || 30;
+                document.getElementById('priceIron').value = data.pricing.ironPrice || 25;
+                document.getElementById('priceFold').value = data.pricing.foldPrice || 20;
+                return data.pricing;
+            }
+        } catch (error) { console.error('Error loading pricing:', error); }
+        return { washPrice: 50, dryPrice: 30, ironPrice: 25, foldPrice: 20 };
+    }
+
+    // ============================================================
+    // UPDATE PRICING
+    // ============================================================
+    document.getElementById('updatePricingBtn').addEventListener('click', async function() {
+        const wash = parseFloat(document.getElementById('priceWash').value);
+        const dry = parseFloat(document.getElementById('priceDry').value);
+        const iron = parseFloat(document.getElementById('priceIron').value);
+        const fold = parseFloat(document.getElementById('priceFold').value);
+        if (isNaN(wash) || isNaN(dry) || isNaN(iron) || isNaN(fold) || wash < 0 || dry < 0 || iron < 0 || fold < 0) {
+            showNotification('Please enter valid numbers.', 'error'); return;
+        }
+        try {
+            const response = await fetch('/api/admin/pricing', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: 1, washPrice: wash, dryPrice: dry, ironPrice: iron, foldPrice: fold })
+            });
+            const data = await response.json();
+            if (data.success) { showNotification('Pricing updated successfully!', 'success'); } 
+            else { showNotification(data.message || 'Update failed', 'error'); }
+        } catch (error) { showNotification('Network error. Please try again.', 'error'); }
+    });
+
+    // ============================================================
+    // LOAD TABLES
+    // ============================================================
+    let currentPricing = { washPrice: 50, dryPrice: 30, ironPrice: 25, foldPrice: 20 };
+
+    async function loadTable(section, tbodyId, isSetPrice) {
+        const tbody = document.getElementById(tbodyId);
+        try {
+            let url = '/api/admin/' + section;
+            if (section === 'set-pricing') {
+                url = '/api/admin/set-pricing';
+            }
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.success && data.orders && data.orders.length > 0) {
+                let html = '';
+                data.orders.forEach(o => {
+                    const services = o.services || 'N/A';
+                    const type = o.serviceType === 'dropoff' ? 'Drop-off' : 'Pick-up';
+                    const weight = o.weight > 0 ? o.weight + ' kg' : '--';
+                    const price = o.price > 0 ? '₱' + o.price : '--';
+                    
+                    if (section === 'claimed') {
+                        html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td>${weight}</td><td>${price}</td></tr>`;
+                    } else if (isSetPrice) {
+                        let buttons = `<button class="action-btn" onclick="window.setPriceOrder(${o.queueNumber}, '${services}', ${o.weight || 0}, ${o.price || 0})">Set Price</button>`;
+                        buttons += ` <button class="action-btn green" onclick="window.moveOrderAction(${o.queueNumber}, 'to_pending')">Move to Pending</button>`;
+                        html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td>${buttons}</td></tr>`;
+                    } else {
+                        let action = '', actionLabel = '';
+                        if (section === 'pending') {
+                            if (services.includes('Wash')) { action = 'to_wash'; actionLabel = 'Move to Wash'; }
+                            else if (services.includes('Dry')) { action = 'to_dry'; actionLabel = 'Move to Dry'; }
+                            else if (services.includes('Iron')) { action = 'to_iron'; actionLabel = 'Move to Iron'; }
+                            else if (services.includes('Fold')) { action = 'to_fold'; actionLabel = 'Move to Fold'; }
+                            else { action = 'to_wash'; actionLabel = 'Move to Wash'; }
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td>${weight}</td><td>${price}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, '${action}')">${actionLabel}</button></td></tr>`;
+                        } else if (section === 'to_wash') {
+                            const next = services.includes('Dry') ? 'to_dry' : services.includes('Iron') ? 'to_iron' : services.includes('Fold') ? 'to_fold' : 'for_pickup';
+                            const label = next === 'to_dry' ? 'Move to Dry' : next === 'to_iron' ? 'Move to Iron' : next === 'to_fold' ? 'Move to Fold' : 'Move to For Pickup';
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, '${next}')">${label}</button></td></tr>`;
+                        } else if (section === 'to_dry') {
+                            const next = services.includes('Iron') ? 'to_iron' : services.includes('Fold') ? 'to_fold' : 'for_pickup';
+                            const label = next === 'to_iron' ? 'Move to Iron' : next === 'to_fold' ? 'Move to Fold' : 'Move to For Pickup';
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, '${next}')">${label}</button></td></tr>`;
+                        } else if (section === 'to_iron') {
+                            const next = services.includes('Fold') ? 'to_fold' : 'for_pickup';
+                            const label = next === 'to_fold' ? 'Move to Fold' : 'Move to For Pickup';
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, '${next}')">${label}</button></td></tr>`;
+                        } else if (section === 'to_fold') {
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, 'for_pickup')">Move to For Pickup</button></td></tr>`;
+                        } else if (section === 'for_pickup') {
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td>${weight}</td><td>${price}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, 'claimed_from_pickup')">Claim</button></td></tr>`;
+                        } else if (section === 'to_deliver') {
+                            html += `<tr><td>${o.queueNumber}</td><td>${o.customerName}</td><td>${services}</td><td>${type}</td><td>${weight}</td><td>${price}</td><td><button class="action-btn" onclick="window.moveOrderAction(${o.queueNumber}, 'claimed')">Claim</button></td></tr>`;
+                        }
+                    }
+                });
+                tbody.innerHTML = html;
+            } else {
+                const cols = section === 'claimed' ? 6 : (section === 'pending' || section === 'for_pickup' || section === 'to_deliver') ? 7 : 5;
+                tbody.innerHTML = `<tr><td colspan="${cols}" style="text-align:center;color:#6f8fa2;">None</td></tr>`;
+            }
+        } catch (error) {
+            console.error('Error loading table:', error);
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#6f8fa2;">Error loading data</td></tr>';
+        }
+    }
+
+    // ============================================================
+    // GLOBAL FUNCTIONS
+    // ============================================================
+    window.setPriceOrder = function(queueNumber, services, weight, price) {
+        showPopup(queueNumber, services, weight, price, currentPricing);
+    };
+
+    window.moveOrderAction = function(queueNumber, action) {
+        const messages = {
+            'to_pending': 'Move this order to Pending?',
+            'to_wash': 'Move this order to Wash?',
+            'to_dry': 'Move this order to Dry?',
+            'to_iron': 'Move this order to Iron?',
+            'to_fold': 'Move this order to Fold?',
+            'for_pickup': 'Move this order to For Pickup?',
+            'to_deliver': 'Move this order to To Deliver?',
+            'claimed': 'Mark this order as Claimed?',
+            'claimed_from_pickup': 'Mark this order as Claimed?'
+        };
+        showConfirmDialog(queueNumber, action, messages[action] || 'Move this order?');
+    };
+
+    // ============================================================
+    // BACK TO MENU (footer click)
+    // ============================================================
+    document.querySelector('.footer-note')?.addEventListener('click', function() {
+        goBackToMenu();
+    });
+
+    // ============================================================
+    // INIT — LOAD SET PRICING LANG
+    // ============================================================
+    loadTable('set-pricing', 'setPriceTableBody', true);
+    // ✅ WALA NANG setInterval
+    // ✅ WALA NANG loadAllTables()
+
+})();
+</script>
+</body>
+</html>

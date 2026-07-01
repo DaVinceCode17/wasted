@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Cyron's Laundry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { min-height: 100vh; background: #d4edff; display: flex; justify-content: center; align-items: center; padding: 40px 20px; }
+        .wrapper { width: 100%; max-width: 700px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .logo-outer { background: white; width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.10); margin-bottom: 20px; }
+        .logo-outer img { width: 150px; height: 150px; object-fit: contain; border-radius: 50%; }
+        .shop-name { font-size: 2.5rem; font-weight: 700; color: #0f2b3a; margin-top: -2px; }
+        .shop-name span { color: #1f6f8a; }
+        .tagline { color: #0f2b3a; font-size: 1.1rem; margin-top: 1px; margin-bottom: 40px; opacity: 0.8; }
+        .form-card { width: 85%; max-width: 85%; background: white; border-radius: 20px; padding: 30px 24px; border: 1px solid #e8eef2; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin: 0 auto; }
+        .form-card h1 { font-size: 28px; color: #0f2b3a; margin-bottom: 6px; }
+        .step-indicator { font-size: 0.8rem; color: #4f6f82; margin-bottom: 16px; }
+        .step-indicator span { font-weight: 700; color: #1f6f8a; }
+        .form-group { margin-bottom: 14px; text-align: left; }
+        .form-group label { display: block; font-weight: 600; color: #0f2b3a; font-size: 0.85rem; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 12px 16px; border-radius: 50px; border: 1px solid #dce6ed; font-size: 0.95rem; background: white; transition: 0.2s; }
+        .form-group input:focus { border-color: #1f6f8a; outline: none; box-shadow: 0 0 0 3px rgba(31,111,138,0.1); }
+        .form-row { display: flex; gap: 12px; margin-bottom: 14px; }
+        .form-row .form-group { flex: 1; margin-bottom: 0; min-width: 0; }
+        .form-row .form-group input { width: 100%; }
+        .step-actions { display: flex; gap: 12px; margin-top: 10px; }
+        .step-actions .btn { flex: 1; padding: 14px 16px; border: none; border-radius: 60px; font-size: 1rem; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: 0.25s; min-width: 0; }
+        .btn-next { background: #1f6f8a; color: white; }
+        .btn-next:hover { background: #185a72; }
+        .btn-prev { background: #eef3f7; color: #0f2b3a; }
+        .btn-prev:hover { background: #dce6ed; }
+        .btn-submit { background: #1a8c4a; color: white; }
+        .btn-submit:hover { background: #14753d; }
+        .btn-cancel { background: #b8860b; color: white; }
+        .btn-cancel:hover { background: #9e7309; }
+        .login-link { margin-top: 16px; font-size: 0.85rem; color: #4f6f82; }
+        .login-link a { color: #1f6f8a; font-weight: 600; text-decoration: none; }
+        .notification { padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 0.85rem; color: #0f2b3a; display: none; }
+        .notification.show { display: block; }
+        .notification.error { background: #FFEBEE; }
+        .notification.success { background: #E8F5E9; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .footer-meta { margin-top: 60px; padding-top: 20px; font-size: 0.8rem; color: #0f2b3a; border-top: 1px solid rgba(255,255,255,0.4); width: 100%; opacity: 0.7; }
+
+        @media (max-width: 600px) {
+            body { padding: 20px; }
+            .logo-outer { width: 120px; height: 120px; margin-bottom: 16px; }
+            .logo-outer img { width: 120px; height: 120px; }
+            .shop-name { font-size: 2rem; margin-top: -20px; }
+            .tagline { font-size: 1rem; margin-bottom: 30px; }
+            .form-card { width: 90%; max-width: 90%; padding: 24px 18px; margin-bottom: -30px; }
+            .step-actions .btn { font-size: 0.9rem; padding: 12px 10px; }
+        }
+        @media (max-width: 450px) {
+            body { padding: 16px; }
+            .logo-outer { width: 100px; height: 100px; margin-bottom: 12px; }
+            .logo-outer img { width: 100px; height: 100px; }
+            .shop-name { font-size: 1.6rem; margin-top: -15px; }
+            .tagline { font-size: 0.9rem; margin-bottom: 20px; }
+            .form-card { width: 100%; max-width: 100%; padding: 20px 14px; }
+            .form-card h1 { font-size: 24px; }
+            .form-group input { padding: 10px 14px; font-size: 0.9rem; }
+            .step-actions .btn { font-size: 0.85rem; padding: 10px 8px; }
+            .form-row { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="logo-outer"><img src="laundry_logo.png" alt="Laundry Logo" /></div>
+        <div class="shop-name">Cyron's <span>Laundry Shop</span></div>
+        <div class="tagline">Clean · Fresh · Delivered</div>
+
+        <div class="form-card">
+            <h1>Register</h1>
+            <div class="step-indicator">Step <span id="stepNum">1</span> of <span>2</span></div>
+            <div id="registerNotification" class="notification"></div>
+
+            <div class="step active" data-step="1">
+                <div class="form-group"><label>First Name</label><input type="text" id="regFirst" placeholder="Enter your first name" /></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Middle Initial</label><input type="text" id="regMiddle" placeholder="M." maxlength="2" /></div>
+                    <div class="form-group"><label>Nickname</label><input type="text" id="regNick" placeholder="e.g. Coach" /></div>
+                </div>
+                <div class="form-group"><label>Surname</label><input type="text" id="regLast" placeholder="Enter your surname" /></div>
+                <div class="step-actions">
+                    <a href="index.html" class="btn btn-cancel">Cancel</a>
+                    <button class="btn btn-next" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <div class="step" data-step="2">
+                <div class="form-group"><label>Address</label><input type="text" id="regAddress" placeholder="Street, City" /></div>
+                <div class="form-group"><label>Contact Number</label><input type="text" id="regContact" placeholder="0917 123 4567" /></div>
+                <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Create a password" /></div>
+                <div class="step-actions">
+                    <button class="btn btn-prev" onclick="prevStep()">← Back</button>
+                    <button class="btn btn-submit" id="saveRegisterBtn">Create Account</button>
+                </div>
+            </div>
+
+            <div class="login-link">Already have an account? <a href="login.html">Sign in here</a></div>
+        </div>
+
+        <div class="footer-meta">
+            <i class="fas fa-cloud-sun"></i> 30°C · Mostly cloudy
+            <span style="margin:0 8px;">|</span>
+            <i class="fas fa-clock"></i> <span id="clockDisplay"></span>
+        </div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clockDisplay').textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        let currentStep = 1;
+        const totalSteps = 2;
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+            document.getElementById('stepNum').textContent = step;
+            currentStep = step;
+        }
+        function nextStep() { if (currentStep < totalSteps) showStep(currentStep + 1); }
+        function prevStep() { if (currentStep > 1) showStep(currentStep - 1); }
+
+        document.getElementById('saveRegisterBtn').addEventListener('click', async function() {
+            const first = document.getElementById('regFirst').value.trim();
+            const last = document.getElementById('regLast').value.trim();
+            const middle = document.getElementById('regMiddle').value.trim();
+            const address = document.getElementById('regAddress').value.trim();
+            const contact = document.getElementById('regContact').value.trim();
+            const nickname = document.getElementById('regNick').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            const notif = document.getElementById('registerNotification');
+
+            if (!first || !last || !contact || !pass) {
+                notif.className = 'notification show error';
+                notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all required fields.';
+                return;
+            }
+            if (pass.length < 4) {
+                notif.className = 'notification show error';
+                notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> Password must be at least 4 characters.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        firstName: first, lastName: last, middleInitial: middle,
+                        address: address, contact: contact, nickname: nickname,
+                        password: pass, role: 'customer'
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    notif.className = 'notification show success';
+                    notif.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                    setTimeout(() => { window.location.href = 'login.html?registered=true'; }, 1000);
+                } else {
+                    notif.className = 'notification show error';
+                    notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
+                }
+            } catch (error) {
+                notif.className = 'notification show error';
+                notif.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>
